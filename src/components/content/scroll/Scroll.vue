@@ -1,5 +1,5 @@
 <template>
-  <div class="wraper">
+  <div class="wraper" ref='wraper'>
      <div class="content">
          <slot></slot>
      </div>
@@ -7,20 +7,57 @@
 </template>
 
 <script>
+ import BScroll from 'better-scroll';
 export default {
   data() {
     return {
-
+       scroll:null
     };
+  },
+  props:{
+      probeType:{
+          type:Number,
+          default:0
+      },
+      pullUpLoad:{
+          type:Boolean,
+          default:false
+      }
   },
   created() {
 
   },
+  mounted(){
+     this.scroll= new BScroll(this.$refs.wraper,{
+         click:true,
+         probeType:3,
+         pullUpLoad:true
+     }); 
+     //监测滚动事件
+     this.scroll.on('scroll',position=>{
+         this.$emit('scroll',position);
+     });
+     //监测滚动到底部
+     this.scroll.on('pullingUp',()=>{
+         this.$emit('getBottom');
+     });
+     
+  },
   methods: {
-
+      //监听回到顶部
+     backTop(x,y,time=500){
+        this.scroll && this.scroll.scrollTo(x,y,time);
+     },
+     //重置监听到底部事件
+     finishPullUp(){
+         console.log('aa');
+         this.scroll && this.scroll.finishPullUp();
+     }
   },
 };
 </script>
 <style scoped>
-
+.wraper{
+    
+}
 </style>

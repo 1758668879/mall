@@ -5,54 +5,14 @@
         <template #nav-center>购物街</template>
       </nav-bar>
     </div>
-    <scroll>
+    <scroll class="scroll" ref="scroll" :probe-type='3' :pull-up-load='true' @scroll="scrollStatus" @getBottom='loadMore'>
       <home-swiper :banners="banners"></home-swiper>
       <recommend-view :recommends="recommends"></recommend-view>
       <Feature />
       <tab-control :titles="titles" @tabClick="tabClick"></tab-control>
       <Goods :goods="goodsList" />
     </scroll>
-
-    <ul>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-      <li>1</li>
-    </ul>
+    <back-top @click.native="backTop" v-if="isShowTop"></back-top>
   </div>
 </template>
   
@@ -60,11 +20,12 @@
 import HomeSwiper from "./childs/HomeSwiper";
 import RecommendView from "./childs/RecommendView";
 import Feature from "./childs/Feature";
+import BackTop from "./childs/BackTop";
 
 import NavBar from "components/common/navbar/NavBar";
 import TabControl from "components/content/tabControl/TabControl";
 import Goods from "components/content/goods/Goods";
-import Scroll from 'components/content/scroll/Scroll';
+import Scroll from "components/content/scroll/Scroll";
 
 import { getHomeMultiData, getGoodsData } from "api/";
 
@@ -80,7 +41,8 @@ export default {
         sell: { page: 0, list: [] }
       },
       currentTab: "pop",
-      tabs: ["pop", "new", "sell"]
+      tabs: ["pop", "new", "sell"],
+      isShowTop: false //是否显示回到顶部图标
     };
   },
   computed: {
@@ -108,7 +70,7 @@ export default {
         .then(res => {
           this.goods[type].page += 1;
           this.goods[type].list.push(...res.data.list);
-          console.log(res);
+          this.$refs.scroll.finishPullUp();
         })
         .catch(err => {
           console.log(err);
@@ -116,6 +78,18 @@ export default {
     },
     tabClick(index) {
       this.currentTab = this.tabs[index];
+    },
+    //回到顶部
+    backTop() {
+      this.$refs.scroll.backTop(0, 0, 1000);
+    },
+    //监测滚动的距离
+    scrollStatus(position) {
+      this.isShowTop = -position.y > 1000;
+    },
+    //加载更多
+    loadMore(){
+      this.getGoodsData(this.currentTab);
     }
   },
   created() {
@@ -131,6 +105,7 @@ export default {
     HomeSwiper,
     RecommendView,
     Feature,
+    BackTop,
 
     NavBar,
     TabControl,
@@ -151,5 +126,13 @@ export default {
   right: 0;
   top: 0;
   z-index: 1;
+}
+.scroll {
+  overflow: hidden;
+  position: absolute;
+  top: 44px;
+  bottom: 49px;
+  left: 0;
+  right: 0;
 }
 </style>
