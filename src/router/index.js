@@ -1,29 +1,55 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import Vue from 'vue';
+import Router from 'vue-router';
+import { getTitle } from 'common/util';
+const originalPush = Router.prototype.push
+Router.prototype.push = function push(location) {
+    return originalPush.call(this, location).catch(err => err)
+}
+Vue.use(Router);
+/* 
+引入路由
 
-Vue.use(VueRouter)
+*/
+const Home = () =>
+    import ('views/home/Home');
+const Category = () =>
+    import ('views/category/Category');
+const Cart = () =>
+    import ('views/cart/Cart');
+const Profile = () =>
+    import ('views/profile/Profile');
+/* 
+映射路由
+*/
+const routes = [{
+        path: '/',
+        redirect: '/home'
+    },
+    {
+        path: '/home',
+        component: Home,
+        meta: { title: "首页" }
+    }, {
+        path: '/category',
+        component: Category,
+        meta: { title: '分类' }
+    }, {
+        path: '/cart',
+        component: Cart,
+        meta: { title: '购物车' }
+    }, {
+        path: '/profile',
+        component: Profile,
+        meta: { title: '个人' }
+    }
+];
 
-const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  }
-]
-
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
+const router = new Router({
+    routes,
+    mode: 'history'
 })
-
-export default router
+router.beforeEach((to, from, next) => {
+    document.title = getTitle(to.meta.title)
+    next();
+})
+export default router;
