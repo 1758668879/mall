@@ -3,8 +3,9 @@ import App from './App.vue'
 import router from './router/index';
 import store from './store/index';
 import VueLazyLoad from 'vue-lazyload';
+import _ from 'lodash';
 
-
+Vue.prototype.$_ = _;
 Vue.use(VueLazyLoad, {
     preLoad: 1.3,
     loading: require('assets/imgs/common/placeholder.png')

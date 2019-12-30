@@ -1,7 +1,7 @@
 <template>
   <div class="goods-item">
     <a :href="goodsItem.link">
-      <img v-lazy="goodsItem.show.img" alt />
+      <img v-lazy="goodsItem.show.img" alt @load="loadImg" />
     </a>
     <div class="goods-descrition">
       <p>{{goodsItem.title}}</p>
@@ -25,7 +25,12 @@ export default {
     }
   },
   created() {},
-  methods: {}
+  methods: {
+    loadImg(){
+      this.refresh();
+    }
+  },
+  inject:['refresh']
 };
 </script>
 <style scoped>

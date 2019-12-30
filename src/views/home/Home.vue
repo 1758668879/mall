@@ -5,7 +5,14 @@
         <template #nav-center>购物街</template>
       </nav-bar>
     </div>
-    <scroll class="scroll" ref="scroll" :probe-type='3' :pull-up-load='true' @scroll="scrollStatus" @getBottom='loadMore'>
+    <scroll
+      class="scroll"
+      ref="scroll"
+      :probe-type="3"
+      :pull-up-load="true"
+      @scroll="scrollStatus"
+      @getBottom="loadMore"
+    >
       <home-swiper :banners="banners"></home-swiper>
       <recommend-view :recommends="recommends"></recommend-view>
       <Feature />
@@ -42,7 +49,8 @@ export default {
       },
       currentTab: "pop",
       tabs: ["pop", "new", "sell"],
-      isShowTop: false //是否显示回到顶部图标
+      isShowTop: false, //是否显示回到顶部图标
+      vali:null
     };
   },
   computed: {
@@ -88,8 +96,26 @@ export default {
       this.isShowTop = -position.y > 1000;
     },
     //加载更多
-    loadMore(){
+    loadMore() {
       this.getGoodsData(this.currentTab);
+    },
+    //重新刷新
+    refresh() {
+      
+     this.vali();
+    },
+    //防抖动函数
+    debounce(func,dalay) {
+      let time;
+      return function() {
+        if (time) {
+          clearTimeout(time);
+        }
+        time = setTimeout(() => {
+          func.apply(this, arguments);
+        }, dalay);
+      };
+      
     }
   },
   created() {
@@ -101,6 +127,9 @@ export default {
     this.getGoodsData("new");
     this.getGoodsData("sell");
   },
+  mounted(){
+     this.vali=this.$_.debounce(this.$refs.scroll.refresh,20);
+  },
   components: {
     HomeSwiper,
     RecommendView,
@@ -111,6 +140,11 @@ export default {
     TabControl,
     Goods,
     Scroll
+  },
+  provide() {
+    return {
+      refresh: this.refresh
+    };
   }
 };
 </script>

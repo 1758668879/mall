@@ -50,8 +50,13 @@ export default {
      },
      //重置监听到底部事件
      finishPullUp(){
-         console.log('aa');
+         
          this.scroll && this.scroll.finishPullUp();
+     },
+     //图片加载完成重新refresh
+     refresh(){
+         this.scroll && this.scroll.refresh();
+          console.log(1);
      }
   },
 };
