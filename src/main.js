@@ -4,7 +4,7 @@ import router from './router/index';
 import store from './store/index';
 import VueLazyLoad from 'vue-lazyload';
 import _ from 'lodash';
-
+import './permise';
 Vue.prototype.$_ = _;
 Vue.use(VueLazyLoad, {
     preLoad: 1.3,
