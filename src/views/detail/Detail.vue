@@ -12,6 +12,7 @@ import DetailSwiper from './childs/DetailSwiper';
 import { detailInfo } from "api/";
 
 export default {
+  name:'detail',
   data() {
     return {
       swiperImgs:[]
