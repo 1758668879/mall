@@ -18,6 +18,9 @@ const Cart = () =>
     import ('views/cart/Cart');
 const Profile = () =>
     import ('views/profile/Profile');
+const Detail = () =>
+    import ('views/detail/Detail');
+
 /* 
 映射路由
 */
@@ -29,6 +32,10 @@ const routes = [{
         path: '/home',
         component: Home,
         meta: { title: "首页" }
+    }, {
+        path: '/detail/:id',
+        component: Detail,
+        meta: { title: '商品详情' }
     }, {
         path: '/category',
         component: Category,

@@ -20,3 +20,12 @@ export function getGoodsData(data) {
         params: data
     })
 }
+
+//获取商品详情信息
+export function detailInfo(data) {
+    return request({
+        url: 'detail',
+        method: 'get',
+        params: data
+    });
+}

@@ -56,7 +56,6 @@ export default {
      //图片加载完成重新refresh
      refresh(){
          this.scroll && this.scroll.refresh();
-          console.log(1);
      }
   },
 };

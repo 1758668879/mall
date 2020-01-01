@@ -1,8 +1,6 @@
 <template>
-  <div class="goods-item">
-    <a :href="goodsItem.link">
+  <div class="goods-item" @click="goodsItemClick(goodsItem.iid)">
       <img v-lazy="goodsItem.show.img" alt @load="loadImg" />
-    </a>
     <div class="goods-descrition">
       <p>{{goodsItem.title}}</p>
       <span class="price">&yen;{{goodsItem.price}}</span>
@@ -28,6 +26,12 @@ export default {
   methods: {
     loadImg(){
       this.refresh();
+    },
+    goodsItemClick(id){
+      console.log(id);
+      this.$router.push({
+        path:`/detail/${id}`,
+      });
     }
   },
   inject:['refresh']

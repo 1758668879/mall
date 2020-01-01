@@ -2,7 +2,7 @@
   <swiper ref="swiper" v-if="banners.length">
     <swiper-item v-for="(item, index) in banners" :key="index">
       <a :href="item.link">
-        <img :src="item.image" alt="item.title" :title='item.title'>
+        <img :src="item.image" @load='swiperImgLoad' alt="item.title" :title='item.title'>
       </a>
     </swiper-item>
   </swiper>
@@ -12,7 +12,12 @@
   import {Swiper, SwiperItem} from 'components/common/swiper'
 
 	export default {
-		name: "HomeSwiper",
+    name: "HomeSwiper",
+    data(){
+        return{
+          count:0//用来记录轮播图的记载次数
+        }
+    },
     components: {
 		  Swiper,
       SwiperItem
@@ -30,6 +35,12 @@
       startTimer() {
 		    if (this.$refs.swiper) {
           this.$refs.swiper.startTimer()
+        }
+      },
+      swiperImgLoad(){
+        if(this.count<1){
+          this.$emit('homeSwiperImgLoad');
+          this.count++;
         }
       }
     }

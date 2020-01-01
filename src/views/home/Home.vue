@@ -5,6 +5,13 @@
         <template #nav-center>购物街</template>
       </nav-bar>
     </div>
+    <tab-control
+      v-show="isFixed"
+      class="isFixed"
+      ref="tabControl1"
+      :titles="titles"
+      @tabClick="tabClick"
+    ></tab-control>
     <scroll
       class="scroll"
       ref="scroll"
@@ -13,10 +20,10 @@
       @scroll="scrollStatus"
       @getBottom="loadMore"
     >
-      <home-swiper :banners="banners"></home-swiper>
+      <home-swiper :banners="banners" @homeSwiperImgLoad="homeSwiperImgLoad"></home-swiper>
       <recommend-view :recommends="recommends"></recommend-view>
       <Feature />
-      <tab-control :titles="titles" @tabClick="tabClick"></tab-control>
+      <tab-control ref="tabControl2" :titles="titles" @tabClick="tabClick"></tab-control>
       <Goods :goods="goodsList" />
     </scroll>
     <back-top @click.native="backTop" v-if="isShowTop"></back-top>
@@ -50,7 +57,10 @@ export default {
       currentTab: "pop",
       tabs: ["pop", "new", "sell"],
       isShowTop: false, //是否显示回到顶部图标
-      vali:null
+      vali: null,
+      tabControlOffsetTop: 0, //tabCOntrol距离顶部的距离
+      isFixed: false, //tabControl是否固定
+      leaveTop: 0 //记录距离离开组件时的距离
     };
   },
   computed: {
@@ -85,7 +95,10 @@ export default {
         });
     },
     tabClick(index) {
+      console.log(index);
       this.currentTab = this.tabs[index];
+      this.$refs.tabControl1.currentIndex = index;
+      this.$refs.tabControl2.currentIndex = index;
     },
     //回到顶部
     backTop() {
@@ -93,7 +106,10 @@ export default {
     },
     //监测滚动的距离
     scrollStatus(position) {
+      //监听回到顶部是否显示
       this.isShowTop = -position.y > 1000;
+      //监听tab-control是否固定
+      this.isFixed = -position.y > this.tabControlOffsetTop;
     },
     //加载更多
     loadMore() {
@@ -101,11 +117,10 @@ export default {
     },
     //重新刷新
     refresh() {
-      
-     this.vali();
+      this.vali();
     },
     //防抖动函数
-    debounce(func,dalay) {
+    debounce(func, dalay) {
       let time;
       return function() {
         if (time) {
@@ -115,7 +130,11 @@ export default {
           func.apply(this, arguments);
         }, dalay);
       };
-      
+    },
+    //轮播图片加载完毕获取tab-control的offsetTop
+    homeSwiperImgLoad() {
+      //console.log(this.$refs.tabControl2.$el.offsetTop);
+      this.tabControlOffsetTop = this.$refs.tabControl2.$el.offsetTop;
     }
   },
   created() {
@@ -127,8 +146,16 @@ export default {
     this.getGoodsData("new");
     this.getGoodsData("sell");
   },
-  mounted(){
-     this.vali=this.$_.debounce(this.$refs.scroll.refresh,20);
+  mounted() {
+    this.vali = this.$_.debounce(this.$refs.scroll.refresh, 20);
+  },
+  activated() {
+    this.$refs.scroll.refresh();
+    this.$refs.scroll.backTop(0, this.leaveTop, 0);
+    
+  },
+  deactivated() {
+    this.leaveTop = this.$refs.scroll.scroll.y;
   },
   components: {
     HomeSwiper,
@@ -168,5 +195,9 @@ export default {
   bottom: 49px;
   left: 0;
   right: 0;
+}
+.isFixed {
+  position: relative;
+  z-index: 3;
 }
 </style>
