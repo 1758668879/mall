@@ -31,7 +31,8 @@ export default {
      this.scroll= new BScroll(this.$refs.wraper,{
          click:true,
          probeType:3,
-         pullUpLoad:true
+         pullUpLoad:true,
+         mouseWheel:true
      }); 
      //监测滚动事件
      this.scroll.on('scroll',position=>{

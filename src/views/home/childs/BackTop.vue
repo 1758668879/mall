@@ -27,7 +27,7 @@ export default {
     
 }
 .back-top img{
-    width: 34px;
+    width: 43px;
     height: 43px;
 }
 </style>

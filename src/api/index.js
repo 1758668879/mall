@@ -1,7 +1,7 @@
 import { request } from 'network/request';
 
 /*
-获取轮播图等数据 
+获取轮播图等数据
  */
 export function getHomeMultiData() {
     return request({
@@ -10,7 +10,7 @@ export function getHomeMultiData() {
     });
 }
 
-/* 
+/*
 获取流行 上新 精选数据
 */
 export function getGoodsData(data) {
@@ -28,4 +28,20 @@ export function detailInfo(data) {
         method: 'get',
         params: data
     });
+}
+
+//对商品详情信息进行处理----标题价格快递
+export class Goods {
+  constructor(itemInfo,columns,shopInfo) {
+    this.title=itemInfo.title;
+    this.lowNowPrice=itemInfo.lowNowPrice;
+    this.lowPrice=itemInfo.lowPrice;
+    this.discountBgColor=itemInfo.discountBgColor;
+    this.discountDesc=itemInfo.discountDesc;
+    this.sell=columns[0];
+    this.collect=columns[1];
+    this.services1=shopInfo.services[0];
+    this.services2=shopInfo.services[1];
+    this.services3=shopInfo.services[2];
+  }
 }
