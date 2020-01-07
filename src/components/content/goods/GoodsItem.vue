@@ -1,6 +1,6 @@
 <template>
   <div class="goods-item" @click="goodsItemClick(goodsItem.iid)">
-      <img v-lazy="goodsItem.show.img" alt @load="loadImg" />
+    <img v-lazy="showImgs" alt @load="loadImg" />
     <div class="goods-descrition">
       <p>{{goodsItem.title}}</p>
       <span class="price">&yen;{{goodsItem.price}}</span>
@@ -14,6 +14,15 @@ export default {
   data() {
     return {};
   },
+  computed: {
+    showImgs() {
+      if (this.goodsItem.show && this.goodsItem.show.img) {
+        return this.goodsItem.show.img;
+      } else if (this.goodsItem.image) {
+        return this.goodsItem.image;
+      }
+    }
+  },
   props: {
     goodsItem: {
       type: Object,
@@ -24,17 +33,17 @@ export default {
   },
   created() {},
   methods: {
-    loadImg(){
+    loadImg() {
       this.refresh();
     },
-    goodsItemClick(id){
+    goodsItemClick(id) {
       console.log(id);
       this.$router.push({
-        path:`/detail/${id}`,
+        path: `/detail/${id}`
       });
     }
   },
-  inject:['refresh']
+  inject: ["refresh"]
 };
 </script>
 <style scoped>
@@ -48,12 +57,11 @@ export default {
 .goods-item img {
   width: 100%;
 }
-.goods-item p{
+.goods-item p {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   margin-bottom: 3px;
-  
 }
 .goods-item .price {
   color: var(--color-high-text);
@@ -69,12 +77,12 @@ export default {
   top: 0;
   width: 14px;
   height: 14px;
-  background: url("~assets/imgs/common/collect.svg") no-repeat 0/14px ;
+  background: url("~assets/imgs/common/collect.svg") no-repeat 0/14px;
 }
-.goods-descrition{
+.goods-descrition {
   position: absolute;
-  bottom:3px;
-  left:0px;
-  right:0px;
+  bottom: 3px;
+  left: 0px;
+  right: 0px;
 }
 </style>

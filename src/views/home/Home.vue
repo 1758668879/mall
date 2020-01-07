@@ -117,6 +117,7 @@ export default {
     },
     //重新刷新
     refresh() {
+      console.log('home');
       this.vali();
     },
     //防抖动函数
@@ -147,7 +148,7 @@ export default {
     this.getGoodsData("sell");
   },
   mounted() {
-    this.vali = this.$_.debounce(this.$refs.scroll.refresh, 20);
+    this.vali = this.debounce(this.$refs.scroll.refresh, 20);
   },
   activated() {
     this.$refs.scroll.refresh();

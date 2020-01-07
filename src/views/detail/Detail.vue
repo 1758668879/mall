@@ -1,13 +1,16 @@
 <template>
   <div class="box">
     <detail-nav-bar class="nav"></detail-nav-bar>
-    <Scroll class="detail" ref="scroll" :probe-type='3' @scroll="scroll">
-      <detail-swiper :swiper-imgs="swiperImgs"></detail-swiper>
+    <Scroll class="detail" ref="scroll" :probe-type="3" @scroll="scroll">
+      <detail-swiper ref="swiper" :swiper-imgs="swiperImgs"></detail-swiper>
       <detail-description :goods="goods"></detail-description>
       <detail-shop :shop-info="shopInfo"></detail-shop>
       <detail-imgs @detailImgLoad="detailImgLoad" :detail-imgs="detailImgs"></detail-imgs>
+      <detail-params ref="params" :detail-params="detailParams"></detail-params>
+      <detail-comment ref="comment" :detail-comment="detailComment"></detail-comment>
+      <detail-recomment ref="recommend" :detail-recommend="detailRecommend"></detail-recomment>
     </Scroll>
-    <back-top v-show='backShow' class="back-top" @click.native="goTop">
+    <back-top v-show="backShow" class="back-top" @click.native="goTop">
       <img src="~assets/imgs/common/top.png" alt />
     </back-top>
   </div>
@@ -19,11 +22,14 @@ import DetailSwiper from "./childs/DetailSwiper";
 import DetailDescription from "./childs/DetailDescription";
 import DetailShop from "./childs/DetailShop";
 import DetailImgs from "./childs/DetailImgs";
+import DetailParams from "./childs/DetailParams";
+import DetailComment from "./childs/DetailComment";
+import DetailRecomment from "./childs/DetailRecomment";
 import BackTop from "./childs/BackTop";
 
 import Scroll from "components/content/scroll/Scroll";
 
-import { detailInfo, Goods } from "api/";
+import { detailInfo, Goods, Params, getRecommend } from "api/";
 
 export default {
   name: "detail",
@@ -33,11 +39,29 @@ export default {
       goods: {},
       shopInfo: {},
       detailImgs: {},
-      backShow:false
+      backShow: false,
+      detailParams: {},
+      detailComment: [],
+      detailRecommend: [],
+      navItemOffstTop: []
     };
   },
   created() {
     this.initData();
+  },
+  mounted() {},
+  updated() {
+    this.$nextTick(() => {
+      setTimeout(() => {
+         this.navItemOffstTop = [];
+        let top1 = this.$refs.swiper.$el.offsetTop;
+        let top2 = this.$refs.params.$el.offsetTop;
+        let top3 = this.$refs.comment.$el.offsetTop;
+        let top4 = this.$refs.recommend.$el.offsetTop;
+        this.navItemOffstTop.push(top1, top2, top3, top4);
+        console.log(this.navItemOffstTop);
+      }, 20);
+    });
   },
   methods: {
     initData() {
@@ -53,6 +77,23 @@ export default {
           this.shopInfo = data.shopInfo;
           //图片详情
           this.detailImgs = data.detailInfo.detailImage[0];
+          //获取参数
+          this.detailParams = new Params(
+            data.itemParams.info,
+            data.itemParams.rule
+          );
+          //商品评论
+          if (data.rate.list.length > 0) {
+            this.detailComment = data.rate.list;
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+      //商品推荐
+      getRecommend()
+        .then(res => {
+          this.detailRecommend = res.data.list;
         })
         .catch(err => {
           console.log(err);
@@ -63,11 +104,15 @@ export default {
       this.$refs.scroll.refresh();
     },
     //回到顶部
-    goTop(){
-      this.$refs.scroll.backTop(0,0,200);
+    goTop() {
+      this.$refs.scroll.backTop(0, 0, 200);
     },
-    scroll(position){
-       this.backShow=-position.y>1000;
+    refresh() {
+      this.$refs.scroll.refresh();
+    },
+    scroll(position) {
+      // console.log(position);
+      this.backShow = -position.y > 1000;
     }
   },
   components: {
@@ -76,9 +121,17 @@ export default {
     DetailDescription,
     DetailShop,
     DetailImgs,
+    DetailParams,
+    DetailComment,
+    DetailRecomment,
     BackTop,
 
     Scroll
+  },
+  provide() {
+    return {
+      refresh: this.refresh
+    };
   }
 };
 </script>
