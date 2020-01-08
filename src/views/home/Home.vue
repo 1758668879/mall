@@ -26,7 +26,7 @@
       <tab-control ref="tabControl2" :titles="titles" @tabClick="tabClick"></tab-control>
       <Goods :goods="goodsList" />
     </scroll>
-    <back-top @click.native="backTop" v-if="isShowTop"></back-top>
+    <back-top @click.native="goTop" v-if="backShow"></back-top>
   </div>
 </template>
   
@@ -42,7 +42,8 @@ import Goods from "components/content/goods/Goods";
 import Scroll from "components/content/scroll/Scroll";
 
 import { getHomeMultiData, getGoodsData } from "api/";
-
+import { debounce} from "common/util";
+import {mixin} from 'common/mixin';
 export default {
   data() {
     return {
@@ -56,13 +57,13 @@ export default {
       },
       currentTab: "pop",
       tabs: ["pop", "new", "sell"],
-      isShowTop: false, //是否显示回到顶部图标
       vali: null,
       tabControlOffsetTop: 0, //tabCOntrol距离顶部的距离
       isFixed: false, //tabControl是否固定
       leaveTop: 0 //记录距离离开组件时的距离
     };
   },
+  mixins:[mixin],
   computed: {
     goodsList() {
       return this.goods[this.currentTab].list;
@@ -100,14 +101,11 @@ export default {
       this.$refs.tabControl1.currentIndex = index;
       this.$refs.tabControl2.currentIndex = index;
     },
-    //回到顶部
-    backTop() {
-      this.$refs.scroll.backTop(0, 0, 1000);
-    },
+   
     //监测滚动的距离
     scrollStatus(position) {
       //监听回到顶部是否显示
-      this.isShowTop = -position.y > 1000;
+      this.backShow = -position.y > this.topY;
       //监听tab-control是否固定
       this.isFixed = -position.y > this.tabControlOffsetTop;
     },
@@ -117,21 +115,10 @@ export default {
     },
     //重新刷新
     refresh() {
-      console.log('home');
+      
       this.vali();
     },
-    //防抖动函数
-    debounce(func, dalay) {
-      let time;
-      return function() {
-        if (time) {
-          clearTimeout(time);
-        }
-        time = setTimeout(() => {
-          func.apply(this, arguments);
-        }, dalay);
-      };
-    },
+   
     //轮播图片加载完毕获取tab-control的offsetTop
     homeSwiperImgLoad() {
       //console.log(this.$refs.tabControl2.$el.offsetTop);
@@ -148,7 +135,7 @@ export default {
     this.getGoodsData("sell");
   },
   mounted() {
-    this.vali = this.debounce(this.$refs.scroll.refresh, 20);
+    this.vali =debounce(this.$refs.scroll.refresh, 20);
   },
   activated() {
     this.$refs.scroll.refresh();

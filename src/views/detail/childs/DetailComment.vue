@@ -17,8 +17,9 @@
         <span class="comment-time">{{item.created | formatTime}}</span>
         <span class="comment-style">{{item.style}}</span>
       </div>
-      <div >
-        <vue-preview class="comment-imgs" :slides="showImgs(item.images)"></vue-preview>
+      <div v-if='item.images'>
+        <img :src="item.images" alt="">
+        <!-- <vue-preview class="comment-imgs" :slides="showImgs(item.images)"></vue-preview> -->
       </div>
     </div>
   </div>

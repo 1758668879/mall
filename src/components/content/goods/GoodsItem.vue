@@ -37,7 +37,6 @@ export default {
       this.refresh();
     },
     goodsItemClick(id) {
-      console.log(id);
       this.$router.push({
         path: `/detail/${id}`
       });

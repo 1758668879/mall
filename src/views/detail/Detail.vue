@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <detail-nav-bar class="nav"></detail-nav-bar>
+    <detail-nav-bar class="nav" ref="nav" @navClick="navClick"></detail-nav-bar>
     <Scroll class="detail" ref="scroll" :probe-type="3" @scroll="scroll">
       <detail-swiper ref="swiper" :swiper-imgs="swiperImgs"></detail-swiper>
       <detail-description :goods="goods"></detail-description>
@@ -29,8 +29,11 @@ import BackTop from "./childs/BackTop";
 
 import Scroll from "components/content/scroll/Scroll";
 
-import { detailInfo, Goods, Params, getRecommend } from "api/";
+import {mixin} from 'common/mixin';
 
+
+import { detailInfo, Goods, Params, getRecommend } from "api/";
+import { debounce} from "common/util";
 export default {
   name: "detail",
   data() {
@@ -39,35 +42,53 @@ export default {
       goods: {},
       shopInfo: {},
       detailImgs: {},
-      backShow: false,
       detailParams: {},
       detailComment: [],
       detailRecommend: [],
-      navItemOffstTop: []
+      navItemOffstTop: [],
+      getOffSetYs: null,
+      scrollIndex: 0,
+      scrollNavs: null
     };
   },
   created() {
     this.initData();
   },
-  mounted() {},
-  updated() {
-    this.$nextTick(() => {
-      setTimeout(() => {
-         this.navItemOffstTop = [];
-        let top1 = this.$refs.swiper.$el.offsetTop;
-        let top2 = this.$refs.params.$el.offsetTop;
-        let top3 = this.$refs.comment.$el.offsetTop;
-        let top4 = this.$refs.recommend.$el.offsetTop;
-        this.navItemOffstTop.push(top1, top2, top3, top4);
-        console.log(this.navItemOffstTop);
-      }, 20);
-    });
+  mixins:[mixin],
+  mounted() {
+    this.getOffSetYs = debounce(() => {
+      this.navItemOffstTop = [];
+      let top1 = this.$refs.swiper.$el.offsetTop;
+      let top2 = this.$refs.params.$el.offsetTop;
+      let top3 = this.$refs.comment.$el.offsetTop;
+      let top4 = this.$refs.recommend.$el.offsetTop;
+      this.navItemOffstTop.push(top1, top2, top3, top4);
+    }, 200);
+    this.scrollNavs = debounce((y) => {
+      let index = this.navItemOffstTop.findIndex(item => {
+        return item > y;
+      });
+      switch (index) {
+        case 1:
+          this.scrollIndex = 0;
+          break;
+        case 2:
+          this.scrollIndex = 1;
+          break;
+        case 3:
+          this.scrollIndex = 2;
+          break;
+        case -1:
+          this.scrollIndex = 3;
+          break;
+      }
+      this.$refs.nav.currentIndex = this.scrollIndex;
+    }, 100);
   },
   methods: {
     initData() {
       detailInfo({ iid: this.$route.params.id })
         .then(res => {
-          console.log(res);
           const data = res.result;
           //轮播图数据
           this.swiperImgs = data.itemInfo.topImages;
@@ -102,17 +123,15 @@ export default {
     //详情图片加载完后刷新better-scroll
     detailImgLoad() {
       this.$refs.scroll.refresh();
+      this.getOffSetYs();
     },
-    //回到顶部
-    goTop() {
-      this.$refs.scroll.backTop(0, 0, 200);
-    },
-    refresh() {
-      this.$refs.scroll.refresh();
-    },
+
     scroll(position) {
-      // console.log(position);
-      this.backShow = -position.y > 1000;
+      this.backShow = -position.y > this.topY;
+      this.scrollNavs(-position.y);
+    },
+    navClick(index) {
+      this.$refs.scroll.backTop(0, -this.navItemOffstTop[index], 500);
     }
   },
   components: {
@@ -130,7 +149,7 @@ export default {
   },
   provide() {
     return {
-      refresh: this.refresh
+      refresh: this.detailImgLoad
     };
   }
 };

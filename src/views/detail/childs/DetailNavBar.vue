@@ -29,6 +29,7 @@ export default {
       },
       navClick(index){
           this.currentIndex=index;
+          this.$emit('navClick',index);
       }
   },
   components: {
