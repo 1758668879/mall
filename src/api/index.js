@@ -43,6 +43,7 @@ export function getRecommend() {
 export class Goods {
     constructor(itemInfo, columns, shopInfo) {
         this.title = itemInfo.title;
+        this.desc = itemInfo.desc;
         this.lowNowPrice = itemInfo.lowNowPrice;
         this.lowPrice = itemInfo.lowPrice;
         this.discountBgColor = itemInfo.discountBgColor;

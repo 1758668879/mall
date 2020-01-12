@@ -1,3 +1,4 @@
+import { ADD_CART_ALL } from '../store/mutations-type';
 const mixin = {
     data() {
         return {
@@ -12,4 +13,17 @@ const mixin = {
         },
     }
 }
-export { mixin }
+const initCart = {
+    created() {
+        if (localStorage.cartList) {
+            this.initCartData();
+        }
+    },
+    methods: {
+        //将本地存储的购物车数据保存到vuex
+        initCartData() {
+            this.$store.commit(ADD_CART_ALL, localStorage.cartList);
+        },
+    }
+}
+export { mixin, initCart }

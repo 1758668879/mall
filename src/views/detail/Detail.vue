@@ -13,6 +13,7 @@
     <back-top v-show="backShow" class="back-top" @click.native="goTop">
       <img src="~assets/imgs/common/top.png" alt />
     </back-top>
+    <bottom-bar @click.native="addCart"></bottom-bar>
   </div>
 </template>
 
@@ -26,14 +27,16 @@ import DetailParams from "./childs/DetailParams";
 import DetailComment from "./childs/DetailComment";
 import DetailRecomment from "./childs/DetailRecomment";
 import BackTop from "./childs/BackTop";
+import BottomBar from "./childs/BottomBar";
 
 import Scroll from "components/content/scroll/Scroll";
+import Toast from "components/common/toast/Toast";
 
-import {mixin} from 'common/mixin';
-
+import { mixin, initCart } from "common/mixin";
 
 import { detailInfo, Goods, Params, getRecommend } from "api/";
-import { debounce} from "common/util";
+import { debounce } from "common/util";
+
 export default {
   name: "detail",
   data() {
@@ -48,13 +51,13 @@ export default {
       navItemOffstTop: [],
       getOffSetYs: null,
       scrollIndex: 0,
-      scrollNavs: null
+      scrollNavs: null,
     };
   },
   created() {
     this.initData();
   },
-  mixins:[mixin],
+  mixins: [mixin, initCart],
   mounted() {
     this.getOffSetYs = debounce(() => {
       this.navItemOffstTop = [];
@@ -64,7 +67,7 @@ export default {
       let top4 = this.$refs.recommend.$el.offsetTop;
       this.navItemOffstTop.push(top1, top2, top3, top4);
     }, 200);
-    this.scrollNavs = debounce((y) => {
+    this.scrollNavs = debounce(y => {
       let index = this.navItemOffstTop.findIndex(item => {
         return item > y;
       });
@@ -90,6 +93,7 @@ export default {
       detailInfo({ iid: this.$route.params.id })
         .then(res => {
           const data = res.result;
+          //console.log(data);
           //轮播图数据
           this.swiperImgs = data.itemInfo.topImages;
           //商品详情数据
@@ -120,6 +124,7 @@ export default {
           console.log(err);
         });
     },
+
     //详情图片加载完后刷新better-scroll
     detailImgLoad() {
       this.$refs.scroll.refresh();
@@ -132,6 +137,20 @@ export default {
     },
     navClick(index) {
       this.$refs.scroll.backTop(0, -this.navItemOffstTop[index], 500);
+    },
+    //加入购物车
+    addCart() {
+      let cartInfo = {
+        iid: this.$route.params.id,
+        image: this.swiperImgs[0],
+        title: this.goods.title,
+        desc: this.goods.desc,
+        price: this.goods.lowNowPrice
+      };
+      //console.log(cartInfo);
+      this.$store.dispatch("addCart", cartInfo).then(res => {
+         this.$toast.show(res);
+      });
     }
   },
   components: {
@@ -144,6 +163,8 @@ export default {
     DetailComment,
     DetailRecomment,
     BackTop,
+    BottomBar,
+    Toast,
 
     Scroll
   },
@@ -173,14 +194,14 @@ export default {
   left: 0;
   right: 0;
   top: 44px;
-  bottom: 0;
+  bottom: 58px;
   z-index: 99;
   background: #fff;
 }
 .back-top {
   position: fixed;
   right: 5px;
-  bottom: 49px;
+  bottom: 60px;
   z-index: 99;
 }
 .back-top img {
