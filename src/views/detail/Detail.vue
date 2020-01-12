@@ -13,7 +13,7 @@
     <back-top v-show="backShow" class="back-top" @click.native="goTop">
       <img src="~assets/imgs/common/top.png" alt />
     </back-top>
-    <bottom-bar @click.native="addCart"></bottom-bar>
+    <bottom-bar @addCart="addCart"></bottom-bar>
   </div>
 </template>
 
