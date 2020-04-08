@@ -11,5 +11,8 @@ module.exports = {
                 'api': '@/api'
             }
         }
+    },
+    devServer: {
+        disableHostCheck: true
     }
 }
