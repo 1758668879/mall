@@ -10,6 +10,8 @@ Vue.use(Router);
 引入路由
 
 */
+const Index = () =>
+    import ('views/index/Index');
 const Home = () =>
     import ('views/home/Home');
 const Category = () =>
@@ -26,7 +28,7 @@ const Detail = () =>
 */
 const routes = [{
         path: '/',
-        redirect: '/home'
+        component: Index
     },
     {
         path: '/home',
